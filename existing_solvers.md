@@ -45,11 +45,6 @@ methods :
 - SimpleTrustRegion
 - SimpleDFSane
 
-## [DynamicSS](https://juliapackages.com/p/steadystatediffeq)
-DynamicSS()
-
-## [Sundials](https://computing.llnl.gov/projects/sundials/kinsol)
-KINSOL()
 
 ## SCIML NLS
 It seems that sciml Non Linear Solvers wraps NLSolve and [other solvers](https://docs.sciml.ai/NonlinearSolve/stable/solvers/NonlinearSystemSolvers/).
