@@ -37,7 +37,7 @@ function bench(file::String)
     file_name_output = joinpath(file_name * ".md")
     open(file_name_output, write=true, append=false) do f
         write(f, "# Benchmarks for $file_name.jl\n\n")
-        show(f,"text/plain", Pkg.status(; f))
+        #show(f,"text/plain", Pkg.status(; f))
         write(f, "```julia\n")
     end
 
