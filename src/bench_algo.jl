@@ -1,4 +1,4 @@
 struct algo_nl
     package::Symbol
-    name::Symbol
+    name::Union{Symbol,Any}
 end

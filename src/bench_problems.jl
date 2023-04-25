@@ -19,44 +19,147 @@ function OCPProblem{(:exponential, :energy, :state_dim_1, :control_dim_1, :lagra
         s[1] = xf - xf_
     end
 
+    function shoot(p0)
+        s = zeros(eltype(p0),1)
+        xf, pf = f(t0, x0, p0, tf)
+        s[1] = xf - xf_
+        return(s)
+    end
+
     # tests
     a = xf_ - x0*exp(-tf)
     b = sinh(tf)
     ξ = a/b
 
-    return(OCPShoot(ξ,shoot!))
+    return(OCPShoot(ξ,shoot,prob.title))
 end
 
-function OCPProblem{(:integrator, :energy, :state_dim_2, :control_dim_1, :lagrange)}()
+function OCPProblem{(:exponential, :consumption, :state_dim_1, :control_dim_1, :lagrange, :control_non_differentiable)}()
 
+    # ---------------------------------------------------------------
     # problem = model + solution
-    prob = Problem(:integrator, :energy, :state_dim_2, :control_dim_1, :lagrange) 
+    prob = Problem(:exponential, :consumption, :state_dim_1, :control_dim_1, :lagrange, :control_non_differentiable) 
     ocp = prob.model
 
     # Flow(ocp, u)
-    f = Flow(ocp, (x, p) -> p[2])
+    f0 = Flow(ocp, (x, p) -> 0)
+    f1 = Flow(ocp, (x, p) -> 1)
 
     # shooting function
     t0 = ocp.initial_time
     tf = ocp.final_time
-    x0 = [-1, 0]
-    xf_ = [0, 0]
+    x0 = -1
+    xf_ = 0
     #
-    function shoot!(s, p0)
-        xf, pf = f(t0, x0, p0, tf)
-        s[1:2] = xf - xf_
+    function shoot!(s, p0, t1)
+        x1, p1 = f0(t0, x0, p0, t1)
+        xf, pf = f1(t1, x1, p1, tf)
+        s[1] = xf - xf_
+        s[2] = p1 - 1
+    end
+
+    function shoot(p0, t1)
+        s = zeros(eltype(p0),2)
+        x1, p1 = f0(t0, x0, p0, t1)
+        xf, pf = f1(t1, x1, p1, tf)
+        s[1] = xf - xf_
+        s[2] = p1 - 1
+        return s
     end
 
     # tests
-    a = x0[1]
-    b = x0[2]
-    C = [-(tf-t0)^3/6 (tf-t0)^2/2
-         -(tf-t0)^2/2 (tf-t0)]
-    D = [-a-b*(tf-t0), -b]+xf_
-    ξ = C\D
+    p0 = 1/(x0-(xf_-1)/exp(-tf))
+    ξ = [p0, -log(p0)]
+    
+    nle! = (s, ξ) -> shoot!(s, ξ[1], ξ[2])
+    nle(ξ) = shoot(ξ[1],ξ[2])
+
+    return(OCPShoot(ξ,nle,prob.title))
+
+end
+
+function OCPProblem{(:exponential, :time, :state_dim_1, :control_dim_1, :lagrange)}()
+
+    # ---------------------------------------------------------------
+    # problem = model + solution
+    prob = Problem(:exponential, :time, :state_dim_1, :control_dim_1, :lagrange) 
+    ocp = prob.model
+
+    # Flow(ocp, u)
+    f⁺ = Flow(ocp, (x, p) -> 1)
+    H⁺(x, p) = p * (-x + 1)
+
+    # shooting function
+    t0 = ocp.initial_time
+    x0 = -1
+    xf_ = 0
+    #
+    function shoot!(s, p0, tf)
+        xf, pf = f⁺(t0, x0, p0, tf)
+        s[1] = xf - xf_
+        s[2] = H⁺(xf, pf) - 1
+    end
+
+    function shoot(p0, tf)
+        s = zeros(eltype(p0),2)
+        xf, pf = f⁺(t0, x0, p0, tf)
+        s[1] = xf - xf_
+        s[2] = H⁺(xf, pf) - 1
+        return s
+    end
+
+    # tests
+    γ  = 1
+    tf = log((-1-γ)/(xf_-γ))
+    p0 = exp(t0-tf)/(γ-xf_)
+    ξ = [p0, tf]
+    
+    nle! = (s, ξ) -> shoot!(s, ξ[1], ξ[2])
+    nle(ξ) = shoot(ξ[1], ξ[2])
+
+    return(OCPShoot(ξ,nle,prob.title))
+
+end
 
 
-    return(OCPShoot(ξ,shoot!))
+function OCPProblem{(:integrator, :energy, :free_final_time, :state_dim_1, :control_dim_1, :lagrange)}()
+
+    # ---------------------------------------------------------------
+    # problem = model + solution
+    prob = Problem(:integrator, :energy, :free_final_time, :state_dim_1, :control_dim_1, :lagrange)
+    ocp = prob.model
+    
+
+    # Flow(ocp, u)
+    f = Flow(ocp, (x, p) -> p)
+
+    # shooting function
+    t0 = ocp.initial_time
+    x0 = 0
+    c(tf, xf) = constraint(ocp, :boundary_constraint)(t0, x0, tf, xf)
+    #
+    function shoot!(s, p0, tf)
+        xf, pf = f(t0, x0, p0, tf)
+        s[1] = c(tf, xf)
+        s[2] = pf - 2
+    end
+
+    function shoot(p0, tf)
+        s = zeros(eltype(p0),2)
+        xf, pf = f(t0, x0, p0, tf)
+        s[1] = c(tf, xf)
+        s[2] = pf - 2
+        return(s)
+    end
+ 
+    # tests
+    p0 = 2
+    tf = 10
+    ξ = [p0, tf]
+    nle! = (s, ξ) -> shoot!(s, ξ[1], ξ[2])
+    nle(ξ) = shoot(ξ[1],ξ[2])
+    return(OCPShoot(ξ,nle,prob.title))
+
 end
 
 function OCPProblem{(:turnpike, :integrator, :state_energy, :state_dim_1, :control_dim_1, :lagrange, :control_constraint, :singular_arc) }()
@@ -87,16 +190,69 @@ function OCPProblem{(:turnpike, :integrator, :state_energy, :state_dim_1, :contr
         s[3] = p1
     end
 
+    function shoot(p0, t1, t2)
+        s = zeros(eltype(p0),3)
+        x1, p1 = fm(t0, x0, p0, t1)
+        x2, p2 = f0(t1, x1, p1, t2)
+        xf_, pf = fp(t2, x2, p2, tf)
+        s[1] = xf_ - xf
+        s[2] = x1
+        s[3] = p1
+        return(s)
+    end
+
+
     # tests
     t1 = x0
     t2 = tf - xf
     p0 = t1^2 - 2*x0*t1
     ξ = [p0, t1, t2]
     nle! = (s, ξ) -> shoot!(s, ξ[1], ξ[2], ξ[3])
+    nle(ξ) = shoot(ξ[1], ξ[2], ξ[3])
 
-    return(OCPShoot(ξ,nle!))
+    return(OCPShoot(ξ,nle,prob.title))
 
 end
+
+
+function OCPProblem{(:integrator, :energy, :state_dim_2, :control_dim_1, :lagrange)}()
+
+    # problem = model + solution
+    prob = Problem(:integrator, :energy, :state_dim_2, :control_dim_1, :lagrange) 
+    ocp = prob.model
+
+    # Flow(ocp, u)
+    f = Flow(ocp, (x, p) -> p[2])
+
+    # shooting function
+    t0 = ocp.initial_time
+    tf = ocp.final_time
+    x0 = [-1, 0]
+    xf_ = [0, 0]
+    #
+    function shoot!(s, p0)
+        xf, pf = f(t0, x0, p0, tf)
+        s[1:2] = xf - xf_
+    end    
+
+    function shoot(p0)
+        s = zeros(eltype(p0),2)
+        xf, pf = f(t0, x0, p0, tf)
+        s[1:2] = xf - xf_
+        return(s)
+    end    
+
+    # tests
+    a = x0[1]
+    b = x0[2]
+    C = [-(tf-t0)^3/6 (tf-t0)^2/2
+         -(tf-t0)^2/2 (tf-t0)]
+    D = [-a-b*(tf-t0), -b]+xf_     
+    ξ = C\D
+
+
+    return(OCPShoot(ξ,shoot,prob.title))
+end    
 
 
 
@@ -177,6 +333,21 @@ function OCPProblem{(:goddard, :classical, :altitude, :state_dim_3, :control_dim
 
     end
 
+    function shoot(p0, t1, t2, t3, tf) # B+ S C B0 structure
+        s = zeros(eltype(p0),7)
+        x1, p1 = f1(t0, x0, p0, t1)
+        x2, p2 = fs(t1, x1, p1, t2)
+        x3, p3 = fb(t2, x2, p2, t3)
+        xf, pf = f0(t3, x3, p3, tf)
+        s[1] = final_mass_cons(xf)
+        s[2:3] = pf[1:2] - [ 1, 0 ]
+        s[4] = H1(x1, p1)
+        s[5] = H01(x1, p1)
+        s[6] = g(x2)
+        s[7] = H0(xf, pf) # free tf
+        return(s)
+    end
+
     # tests
     t1 = 0.02350968402023801
     t2 = 0.05973738095397227
@@ -190,7 +361,43 @@ function OCPProblem{(:goddard, :classical, :altitude, :state_dim_3, :control_dim
 
 
     nle! = (s, ξ) -> shoot!(s, ξ[1:3], ξ[4], ξ[5], ξ[6], ξ[7])
+    nle(ξ) = shoot(ξ[1:3],ξ[4], ξ[5], ξ[6], ξ[7])
+
+
+    return(OCPShoot(ξ,nle,prob.title))
+
+end
+
+
+function OCPProblem{(:integrator, :energy, :distance, :state_dim_2, :control_dim_1, :bolza)}()
+
+    # problem = model + solution
+    prob = Problem(:integrator, :energy, :distance, :state_dim_2, :control_dim_1, :bolza)
+    ocp = prob.model
+
+    # Flow(ocp, u)
+    f = Flow(ocp, (x, p) -> p[2])
+
+    # shooting function
+    t0 = ocp.initial_time
+    tf = ocp.final_time
+    x0 = [0,0]
+    #
+    function shoot!(s, p0)
+        xf, pf = f(t0, x0, p0, tf)
+        s[1:2] = pf - [1/2, 0]
+    end
+
+    function shoot(p0)
+        s = zeros(eltype(p0),2)
+        xf, pf = f(t0, x0, p0, tf)
+        s[1:2] = pf - [1/2, 0]
+        return(s)
+    end
+
+    # tests
+    ξ = [1/2, tf/2]
     
-    return(OCPShoot(ξ,nle!))
+    return(OCPShoot(ξ,shoot,prob.title))
 
 end

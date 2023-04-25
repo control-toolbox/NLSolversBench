@@ -1,6 +1,6 @@
 using Revise
 try
-    revise(CTProblems)
+    revise(NLSOLVERSBENCH)
 catch
 end
 
@@ -74,6 +74,13 @@ function bench(file::String)
                         has_displayed = true
                         doBenchMarking(quote $benchname end, f)
                         expr = :()
+                    end
+                    Expr(:call, fun, args...)   => begin
+                        write(f, string(expr)*"\n")
+                        println("Call                   ",f)
+                        if(expr.args[1] == "src/bench_all.svg")
+                            write(f,"```\n [fig](src/bench_all.svg)")
+                        end
                     end
                     _ => begin
                         write(f, string(expr)*"\n")

@@ -3,53 +3,53 @@
 ```julia
 include("bench_problems.jl")
 pb1 = OCPProblem{(:exponential, :energy, :state_dim_1, :control_dim_1, :lagrange)}()
-@benchmark solve_generic(pb1.shoot!, pb1.sol, :MINPACK, :hybr)
+@benchmark solve_generic(pb1.shoot, pb1.sol, :MINPACK, :hybr)
 ```
 
 ```bash
-BenchmarkTools.Trial: 2745 samples with 1 evaluation.
- Range (min … max):  1.627 ms … 27.702 ms  ┊ GC (min … max): 0.00% … 92.14%
- Time  (median):     1.680 ms              ┊ GC (median):    0.00%
- Time  (mean ± σ):   1.817 ms ±  1.763 ms  ┊ GC (mean ± σ):  6.61% ±  6.37%
+BenchmarkTools.Trial: 2653 samples with 1 evaluation.
+ Range (min … max):  1.622 ms … 70.250 ms  ┊ GC (min … max): 0.00% … 97.06%
+ Time  (median):     1.672 ms              ┊ GC (median):    0.00%
+ Time  (mean ± σ):   1.881 ms ±  3.485 ms  ┊ GC (mean ± σ):  9.47% ±  4.98%
 
-    ▃█▆▄▅▇▆▆▅▁▁                                               
-  ▃▇████████████▆▆▄▄▃▃▃▃▃▃▃▂▂▃▂▂▂▁▂▂▂▂▁▁▂▂▂▁▂▂▂▂▂▂▃▂▂▃▃▂▂▂▁▂ ▄
-  1.63 ms        Histogram: frequency by time           2 ms <
+    ▃█▇▆▅▄▃▂▄                                                 
+  ▃▆███████████▇▅▄▄▄▃▃▂▂▂▂▂▂▂▂▂▁▂▂▂▁▂▂▁▁▁▂▂▄▄▄▃▃▃▃▃▂▃▃▃▂▂▂▂▂ ▃
+  1.62 ms        Histogram: frequency by time        1.99 ms <
 
- Memory estimate: 941.95 KiB, allocs estimate: 23291.
+ Memory estimate: 935.06 KiB, allocs estimate: 23162.
 ```
 
 ```julia
-@benchmark solve_generic(pb1.shoot!, pb1.sol, :MINPACK, :lm)
+@benchmark solve_generic(pb1.shoot, pb1.sol, :MINPACK, :lm)
 ```
 
 ```bash
-BenchmarkTools.Trial: 2746 samples with 1 evaluation.
- Range (min … max):  1.623 ms … 29.104 ms  ┊ GC (min … max): 0.00% … 93.17%
- Time  (median):     1.681 ms              ┊ GC (median):    0.00%
- Time  (mean ± σ):   1.817 ms ±  1.772 ms  ┊ GC (mean ± σ):  6.64% ±  6.37%
+BenchmarkTools.Trial: 2646 samples with 1 evaluation.
+ Range (min … max):  1.622 ms … 69.462 ms  ┊ GC (min … max): 0.00% … 96.92%
+ Time  (median):     1.678 ms              ┊ GC (median):    0.00%
+ Time  (mean ± σ):   1.886 ms ±  3.471 ms  ┊ GC (mean ± σ):  9.42% ±  4.98%
 
-     ▅█▆▅▇▇▆▅▃▄                                               
-  ▂▄███████████▇▇▆▅▄▄▃▄▃▃▂▃▃▂▂▂▂▂▁▂▂▂▂▂▁▁▂▂▁▂▁▂▃▂▃▂▂▂▂▂▂▃▂▂▂ ▄
-  1.62 ms        Histogram: frequency by time           2 ms <
+    ▃▄█▆▇▆▄▅▅▄▂                                               
+  ▅▇███████████▆▇▅▅▄▄▃▃▃▃▃▂▂▂▂▂▂▂▂▂▂▁▂▂▂▂▃▃▄▄▄▄▄▃▃▃▃▃▃▂▂▂▂▂▂ ▄
+  1.62 ms        Histogram: frequency by time        1.99 ms <
 
- Memory estimate: 942.08 KiB, allocs estimate: 23293.
+ Memory estimate: 935.19 KiB, allocs estimate: 23164.
 ```
 
 ```julia
-@benchmark solve_generic(pb1.shoot!, pb1.sol, :NLsolve, :anderson)
+@benchmark solve_generic(pb1.shoot, pb1.sol, :NLsolve, :anderson)
 ```
 
 ```bash
-BenchmarkTools.Trial: 8126 samples with 1 evaluation.
- Range (min … max):  540.830 μs … 27.802 ms  ┊ GC (min … max): 0.00% … 96.68%
- Time  (median):     559.039 μs              ┊ GC (median):    0.00%
- Time  (mean ± σ):   611.660 μs ±  1.010 ms  ┊ GC (mean ± σ):  6.56% ±  3.88%
+BenchmarkTools.Trial: 7931 samples with 1 evaluation.
+ Range (min … max):  538.481 μs … 67.890 ms  ┊ GC (min … max): 0.00% … 98.97%
+ Time  (median):     557.061 μs              ┊ GC (median):    0.00%
+ Time  (mean ± σ):   626.848 μs ±  1.984 ms  ┊ GC (mean ± σ):  9.38% ±  2.94%
 
-    ▂█▆▁                                                        
-  ▁▂████▆▅▃▄▄▄▄▃▃▃▂▂▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ ▂
-  541 μs          Histogram: frequency by time          748 μs <
+    ▃▇█▇█▇▄▁▂▂▁                                                 
+  ▂▆███████████▇▆▅▄▃▃▂▂▂▂▂▂▂▁▂▁▁▁▁▁▁▁▁▁▁▂▂▃▃▃▃▂▃▂▂▂▂▂▁▁▁▁▁▁▁▁▁ ▃
+  538 μs          Histogram: frequency by time          668 μs <
 
- Memory estimate: 315.78 KiB, allocs estimate: 7790.
+ Memory estimate: 313.48 KiB, allocs estimate: 7747.
 ```
 
