@@ -57,4 +57,4 @@ plot!(xscale = :log10, yscale = :linear)
 plot!(legend = :outerbottom)
 savefig("src/bench_all.svg")
 ```
-[fig](bench_all.svg)
+ ![fig](bench_all.svg)

@@ -77,9 +77,8 @@ function bench(file::String)
                     end
                     Expr(:call, fun, args...)   => begin
                         write(f, string(expr)*"\n")
-                        println("Call                   ",f)
-                        if(expr.args[1] == "src/bench_all.svg")
-                            write(f,"```\n [fig](src/bench_all.svg)")
+                        if(expr.args[2] == "src/bench_all.svg")
+                            write(f,"```\n ![fig](bench_all.svg)")
                         end
                     end
                     _ => begin
