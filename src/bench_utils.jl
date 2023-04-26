@@ -60,3 +60,14 @@ function generate_variation(ξ,σ,n)
     ξ_var = [([σ*el*rand(d) for el in ξ] .+ ξ) for i = 1:n]
     return (ξ_var)
 end
+
+
+
+
+function shorten_label(lab::String)
+    if lab == "algo_nl(:NonlinearSolve, NewtonRaphson{0, true, Val{:forward}, Nothing, typeof(NonlinearSolve.DEFAULT_PRECS), true, nothing}(nothing, NonlinearSolve.DEFAULT_PRECS))"
+        return("algo_nl(:NonlinearSolve, NewtonRaphson)")
+    else
+        return(lab)
+    end
+end
