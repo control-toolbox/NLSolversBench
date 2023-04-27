@@ -31,7 +31,6 @@ end
 
 function displayTable(expr, f)
     println("Table of $expr")
-    write(f, string(expr)*"\n")
     write(f, "```\n\n")
     write(f, eval(expr))
     write(f, "\n\n")
@@ -89,7 +88,6 @@ function bench(file::String)
                             write(f,"```\n ![fig](bench_all.svg) \n ```julia \n")
                         end
                         if(string(expr.args[1]) == "pretty_table")
-                            println("LEROY JENKINS                                   ")
                             displayTable(expr,f)
                         end
                     end
