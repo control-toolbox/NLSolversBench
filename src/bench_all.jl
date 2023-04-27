@@ -13,6 +13,8 @@ using ProgressBars
 using NonlinearSolve
 using Sundials
 using DataFrames
+using CSV
+using PrettyTables
 
 include("bench_problems.jl")
 include("bench_algo.jl")
@@ -47,7 +49,6 @@ problem_list = [
 function compute_rate(algos,problem_list,ξ_list)
     rate_tol = Dict()
     time_elapsed = Dict() 
-    rate_pb_algo = Dict()
     df_rate = DataFrame()
     
     df_rate.name = [problem.title for problem in problem_list]
@@ -70,7 +71,6 @@ function compute_rate(algos,problem_list,ξ_list)
                 acc = acc + E_tab[2]
             end
             append!(temp_rate,acc/size(collect(values(ξ_list))[1],1))
-            rate_pb_algo[(algo,pb.title)] = acc/size(collect(values(ξ_list))[1],1)
         end
 
         nb_it = (size(problem_list).*size(collect(values(ξ_list))[1],1))
@@ -80,14 +80,16 @@ function compute_rate(algos,problem_list,ξ_list)
         df_rate[:,shorten_label(string(algo))] = temp_rate
 
     end
-    return rate_tol,time_elapsed,rate_pb_algo,df_rate
+    return rate_tol,time_elapsed,df_rate
 end
 
 
 
-rates_tol,times,rate_pb_algo,df_rate = compute_rate(algos,problem_list,ξ_list)
+rates_tol,times,df_rate = compute_rate(algos,problem_list,ξ_list)
 println([string(key) for key in collect(keys(rates_tol))])
 plot([10.0^(-i) for i = 10:-2:0],[rates_tol[key] for key in collect(keys(rates_tol))], label = reshape([shorten_label(string(key))*" in mean time "*string(times[key]) for key in collect(keys(rates_tol))],1,size(algos,1)))
 plot!(xscale=:log10, yscale=:linear)
 plot!(legend=:outerbottom)
-savefig("src/bench_all.svg") 
+savefig("build/bench_all.svg") 
+CSV.write("build/df_rate_algo.csv", df_rate)
+pretty_table(String, df_rate; tf=tf_markdown, alignment=:c, header = ["name"; [shorten_label(string(algo)) for algo in algos]])

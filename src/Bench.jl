@@ -29,12 +29,20 @@ function doBenchMarking(expr, f)
 
 end
 
+function displayTable(expr, f)
+    println("Table of $expr")
+    write(f, string(expr)*"\n")
+    write(f, "```\n\n")
+    write(f, eval(expr))
+    write(f, "\n\n")
+end
+
 function bench(file::String)
 
-    file_name = split(file, ".")[1]
+    file_name = split(file, ('.','/'))[2]
     println("Benching $file_name.jl\n")
 
-    file_name_output = joinpath(file_name * ".md")
+    file_name_output = joinpath("build/" * file_name * ".md")
     open(file_name_output, write=true, append=false) do f
         write(f, "# Benchmarks for $file_name.jl\n\n")
         #show(f,"text/plain", Pkg.status(; f))
@@ -77,8 +85,12 @@ function bench(file::String)
                     end
                     Expr(:call, fun, args...)   => begin
                         write(f, string(expr)*"\n")
-                        if(expr.args[2] == "src/bench_all.svg")
-                            write(f,"```\n ![fig](bench_all.svg)")
+                        if(string(expr.args[1]) == "savefig")
+                            write(f,"```\n ![fig](bench_all.svg) \n ```julia \n")
+                        end
+                        if(string(expr.args[1]) == "pretty_table")
+                            println("LEROY JENKINS                                   ")
+                            displayTable(expr,f)
                         end
                     end
                     _ => begin
