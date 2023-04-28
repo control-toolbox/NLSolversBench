@@ -31,7 +31,7 @@ algos = [
 ]
 problem_list = [
     OCPProblem{(:exponential, :energy, :state_dim_1, :control_dim_1, :lagrange)}()
-    #OCPProblem{(:exponential, :consumption, :state_dim_1, :control_dim_1, :lagrange, :control_non_differentiable)}()
+    #OCPProblem{(:exponential, :consumption, :state_dim_1, :control_dim_1, :lagrange, :control_non_differentiable)}() # is not in release
     OCPProblem{(:exponential, :time, :state_dim_1, :control_dim_1, :lagrange)}()
     OCPProblem{(:integrator, :energy, :free_final_time, :state_dim_1, :control_dim_1, :lagrange)}()
     OCPProblem{(:turnpike, :integrator, :state_energy, :state_dim_1, :control_dim_1, :lagrange, :control_constraint, :singular_arc)}()

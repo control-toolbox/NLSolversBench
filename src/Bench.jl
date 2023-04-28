@@ -91,6 +91,9 @@ function bench(file::String)
                             displayTable(expr,f)
                         end
                     end
+                    Expr(:function, sig, args...)         => begin
+                        nothing
+                    end 
                     _ => begin
                         write(f, string(expr)*"\n")
                     end
