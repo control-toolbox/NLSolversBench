@@ -19,6 +19,7 @@ using PrettyTables
 include("bench_problems.jl")
 include("bench_algo.jl")
 
+# non linear solvers to bench
 algos = [
     algo_nl(:MINPACK,:hybr),
     #algo_nl(:MINPACK,:lm), # gives very bad results
@@ -29,6 +30,8 @@ algos = [
     #algo_nl(:NonlinearSolve,TrustRegion()), # does not work, surely because it's in wip
     #algo_nl(:NonlinearSolve,KINSOL()) # may be unstable if too far from the solution and don't finish
 ]
+
+# list of the problems to bench the solvers on
 problem_list = [
     OCPProblem{(:exponential, :energy, :state_dim_1, :control_dim_1, :lagrange)}()
     #OCPProblem{(:exponential, :consumption, :state_dim_1, :control_dim_1, :lagrange, :control_non_differentiable)}() # is not in release
@@ -42,10 +45,11 @@ problem_list = [
     #OCPProblem{(:orbital_transfert, :energy, :state_dim_4, :control_dim_2, :lagrange)}()
 ]
 
-
+# generate variations of the true solution for each problem  
 ξ_list = Dict(pb => generate_variation(pb.sol,3,10) for pb in problem_list)
 
-
+# function that iterate over the problems, algos and variations to solve the non linear problem
+# return rate_tol, time_elapsed and df_rate 
 function compute_rate(algos,problem_list,ξ_list)
     rate_tol = Dict()
     time_elapsed = Dict() 
@@ -56,7 +60,7 @@ function compute_rate(algos,problem_list,ξ_list)
     for algo in algos
         println("Using algo : ", algo)
         success = [0 for i = 0:2:10]
-        time = 0
+        time_spent = 0
         temp_rate = zeros(0)
         for pb in problem_list
             println("           with problem : ", pb.title)
@@ -64,7 +68,22 @@ function compute_rate(algos,problem_list,ξ_list)
             iter = ProgressBar(1:size(collect(values(ξ_list))[1],1))
             for i in iter
                 ξ_guess = ξ_list[pb][i]
-                time += @elapsed (res = solve_generic(pb.shoot,ξ_guess,algo.package,algo.name))
+                time_spent += @elapsed (res = solve_generic(pb.shoot,ξ_guess,algo.package,algo.name))
+                
+                # res = sol_shoot((ξ_guess isa Real) ? [ξ_guess] : ξ_gues,false)
+                # function solve_t()
+                #     time_spent = time_spent + @elapsed (res = solve_generic(pb.shoot,ξ_guess,algo.package,algo.name))
+                # end
+                # task_solve = Task(solve_t)
+                # schedule(task_solve)
+
+                # yield()
+                # t0 = time()
+                # while(!istaskdone(task_solve) && time()-t0 ≤ 5)
+                #     print("")
+                #     #istaskstarted(task_f)
+                # end
+
                 E_rel = (norm(res.x) - norm(pb.sol))/norm(pb.sol)
                 E_tab = [E_rel ≤ 10.0^(-i) for i = 10:-2:0]
                 success = success + E_tab
@@ -75,7 +94,7 @@ function compute_rate(algos,problem_list,ξ_list)
 
         nb_it = (size(problem_list).*size(collect(values(ξ_list))[1],1))
         rate_tol[algo] = success./nb_it
-        time_elapsed[algo] = time./nb_it 
+        time_elapsed[algo] = time_spent./nb_it 
 
         df_rate[:,shorten_label(string(algo))] = temp_rate
 
@@ -86,10 +105,18 @@ end
 
 
 rates_tol,times,df_rate = compute_rate(algos,problem_list,ξ_list)
-println([string(key) for key in collect(keys(rates_tol))])
+#println([string(key) for key in collect(keys(rates_tol))])
+
+# plot rate vs relative error 
 plot([10.0^(-i) for i = 10:-2:0],[rates_tol[key] for key in collect(keys(rates_tol))], label = reshape([shorten_label(string(key))*" in mean time "*string(times[key]) for key in collect(keys(rates_tol))],1,size(algos,1)))
 plot!(xscale=:log10, yscale=:linear)
 plot!(legend=:outerbottom)
-savefig("build/bench_all.svg") 
+savefig("build/bench_all.svg")
+
+# save the dataframe as csv (currently not used) 
 CSV.write("build/df_rate_algo.csv", df_rate)
-pretty_table(String, df_rate; tf=tf_markdown, alignment=:c, header = ["name"; [shorten_label(string(algo)) for algo in algos]])
+
+# create a pretty_table for the dataframe (colors does not work in md files)
+h1 = Highlighter((df_rate, i, j) -> j in [2,3,4,5] && df_rate[i, j] == minimum(df_rate[:, j]), bold = true, foreground = :red )
+h2 = Highlighter((df_rate, i, j) -> j in [2,3,4,5] && df_rate[i, j] == maximum(df_rate[:, j]), bold = true, foreground = :green )
+pretty_table(String,df_rate; tf = tf_markdown, alignment = :c, header = ["name"; [shorten_label(string(algo)) for algo = algos]],highlighters=(h1,h2))
