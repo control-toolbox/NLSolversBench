@@ -1,7 +1,8 @@
 name,"algo_nl(:MINPACK, :hybr)","algo_nl(:NLsolve, :newton)","algo_nl(:NLsolve, :trust_region)","algo_nl(:NonlinearSolve, NewtonRaphson)"
 simple exponential - energy min,1.0,1.0,1.0,1.0
+simple exponential - conso min,1.0,1.0,1.0,1.0
 simple exponential - time min,1.0,1.0,1.0,1.0
-simple integrator - energy min - free tf,0.8,1.0,0.8,1.0
-simple nonsmooth turnpike - state energy min - affine system in u,1.0,1.0,1.0,1.0
+simple integrator - energy min - free tf,1.0,1.0,1.0,1.0
+simple nonsmooth turnpike - state energy min - affine system in u,0.8,1.0,1.0,1.0
 Double integrator energy - minimise ∫ u²,1.0,1.0,1.0,1.0
 Double integrator energy/distance - minimise -x₁ + ∫ u²,1.0,1.0,1.0,1.0

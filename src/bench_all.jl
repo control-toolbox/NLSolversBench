@@ -33,16 +33,16 @@ algos = [
 
 # list of the problems to bench the solvers on
 problem_list = [
-    OCPProblem{(:exponential, :energy, :state_dim_1, :control_dim_1, :lagrange)}()
-    #OCPProblem{(:exponential, :consumption, :state_dim_1, :control_dim_1, :lagrange, :control_non_differentiable)}() # is not in release
-    OCPProblem{(:exponential, :time, :state_dim_1, :control_dim_1, :lagrange)}()
-    OCPProblem{(:integrator, :energy, :free_final_time, :state_dim_1, :control_dim_1, :lagrange)}()
-    OCPProblem{(:turnpike, :integrator, :state_energy, :state_dim_1, :control_dim_1, :lagrange, :control_constraint, :singular_arc)}()
-    OCPProblem{(:integrator, :energy, :state_dim_2, :control_dim_1, :lagrange, :noconstraints) }()
-    #OCPProblem{(:integrator, :energy, :state_dim_2, :control_dim_1, :lagrange, :control_constraint)}()
-    #OCPProblem{(:goddard, :classical, :altitude, :state_dim_3, :control_dim_1, :mayer, :state_constraint, :control_constraint, :singular_arc)}()
-    OCPProblem{(:integrator, :energy, :distance, :state_dim_2, :control_dim_1, :bolza)}()
-    #OCPProblem{(:orbital_transfert, :energy, :state_dim_4, :control_dim_2, :lagrange)}()
+    OCPProblem{(:exponential, :energy, :x_dim_1, :u_dim_1, :lagrange)}()
+    OCPProblem{(:exponential, :consumption, :x_dim_1, :u_dim_1, :lagrange, :non_diff_wrt_u)}()
+    OCPProblem{(:exponential, :time, :x_dim_1, :u_dim_1, :lagrange)}()
+    OCPProblem{(:integrator, :energy, :free_final_time, :x_dim_1, :u_dim_1, :lagrange)}()
+    OCPProblem{(:turnpike, :integrator, :state_energy, :x_dim_1, :u_dim_1, :lagrange, :u_cons, :singular_arc)}()
+    OCPProblem{(:integrator, :energy, :x_dim_2, :u_dim_1, :lagrange, :noconstraints)}()
+    #OCPProblem{(:integrator, :energy, :x_dim_2, :u_dim_1, :lagrange, :u_cons)}() # Warning: Automatic dt set the starting dt as NaN, causing instability. Exiting.
+    #OCPProblem{(:goddard, :classical, :altitude, :x_dim_3, :u_dim_1, :mayer, :x_cons, :u_cons, :singular_arc)}() # Warning: dt(-8.804759669936376e-18) <= dtmin(1.3877787807814457e-17) at t=0.04188061327788384. Aborting. There is either an error in your model specification or the true solution is unstable. + error
+    OCPProblem{(:integrator, :energy, :distance, :x_dim_2, :u_dim_1, :bolza)}()
+    #OCPProblem{(:orbital_transfert, :energy, :x_dim_4, :u_dim_2, :lagrange)}() # Warning: Interrupted. Larger maxiters is needed. If you are using an integrator for non-stiff ODEs or an automatic switching algorithm (the default), you may want to consider using a method for stiff equations. See the solver pages for more details (e.g. https://docs.sciml.ai/DiffEqDocs/stable/solvers/ode_solve/#Stiff-Problems).
 ]
 
 # generate variations of the true solution for each problem  
@@ -81,8 +81,9 @@ function compute_rate(algos,problem_list,ξ_list)
                 # t0 = time()
                 # while(!istaskdone(task_solve) && time()-t0 ≤ 5)
                 #     print("")
-                #     #istaskstarted(task_f)
+                #     #istaskstarted(task_solve)
                 # end
+                # Base.throwto(task_solve, InterruptException())
 
                 E_rel = (norm(res.x) - norm(pb.sol))/norm(pb.sol)
                 E_tab = [E_rel ≤ 10.0^(-i) for i = 10:-2:0]

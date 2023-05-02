@@ -2,19 +2,19 @@
 
 ```julia
 include("bench_problems.jl")
-pb1 = OCPProblem{(:exponential, :energy, :state_dim_1, :control_dim_1, :lagrange)}()
+pb1 = OCPProblem{(:exponential, :energy, :x_dim_1, :u_dim_1, :lagrange)}()
 @benchmark solve_generic(pb1.shoot, pb1.sol, :MINPACK, :hybr)
 ```
 
 ```bash
-BenchmarkTools.Trial: 2808 samples with 1 evaluation.
- Range (min … max):  1.574 ms … 27.907 ms  ┊ GC (min … max): 0.00% … 93.38%
- Time  (median):     1.607 ms              ┊ GC (median):    0.00%
- Time  (mean ± σ):   1.777 ms ±  1.704 ms  ┊ GC (mean ± σ):  6.66% ±  6.49%
+BenchmarkTools.Trial: 2622 samples with 1 evaluation.
+ Range (min … max):  1.556 ms … 35.777 ms  ┊ GC (min … max): 0.00% … 94.58%
+ Time  (median):     1.647 ms              ┊ GC (median):    0.00%
+ Time  (mean ± σ):   1.901 ms ±  1.985 ms  ┊ GC (mean ± σ):  6.60% ±  6.04%
 
-  ▅█▇▇▇▆▅▅▄▃▃▁▁                           ▁   ▂▂▃▂▁          ▂
-  █████████████▇█▆▆▇▇▆▄▁▄▄▄▁▄▁▁▅▇▇█▆█▆▇▆▇▄███▆██████▇▇▅▆▅▁▁▄ █
-  1.57 ms      Histogram: log(frequency) by time     2.07 ms <
+  ▆██▇▆▄▃▂▂▂▃▃▂▁▂▁   ▁ ▁                                     ▁
+  █████████████████▇████▆▇▇▇▆██▇▇▆▆▇▇▇█▆▇▆▆▅▇▅▆▇▄▆▄▆▄▄▅▄▄▁▄▆ █
+  1.56 ms      Histogram: log(frequency) by time     3.31 ms <
 
  Memory estimate: 942.14 KiB, allocs estimate: 23294.
 ```
@@ -24,14 +24,14 @@ BenchmarkTools.Trial: 2808 samples with 1 evaluation.
 ```
 
 ```bash
-BenchmarkTools.Trial: 2799 samples with 1 evaluation.
- Range (min … max):  1.572 ms … 26.879 ms  ┊ GC (min … max): 0.00% … 92.07%
- Time  (median):     1.612 ms              ┊ GC (median):    0.00%
- Time  (mean ± σ):   1.784 ms ±  1.698 ms  ┊ GC (mean ± σ):  6.63% ±  6.50%
+BenchmarkTools.Trial: 2351 samples with 1 evaluation.
+ Range (min … max):  1.559 ms … 51.634 ms  ┊ GC (min … max): 0.00% … 94.54%
+ Time  (median):     1.716 ms              ┊ GC (median):    0.00%
+ Time  (mean ± σ):   2.117 ms ±  2.303 ms  ┊ GC (mean ± σ):  6.55% ±  6.05%
 
-  ▅██▇▇▆▆▅▅▄▃▃▂▁▁  ▁                      ▁   ▂▃▂▁▁          ▁
-  ████████████████▆█▆▆▆▅▄▄▃▅▅▄▅▅▇█▅▇▅▅▄▇▆▆█▆█████████▆▆▄▅▄▃▆ █
-  1.57 ms      Histogram: log(frequency) by time     2.07 ms <
+  ▇█▇▆▅▄▃▃▃▂▂▂▁▂▁▂▁  ▁                                       ▁
+  █████████████████████▇███▇██▇▇▆▇█▅▆▇▇▆▆▆▆▆▇▆▆▅▆▅▆▄▅▄▆▁▄▅▄▄ █
+  1.56 ms      Histogram: log(frequency) by time     4.71 ms <
 
  Memory estimate: 942.27 KiB, allocs estimate: 23296.
 ```
@@ -41,14 +41,14 @@ BenchmarkTools.Trial: 2799 samples with 1 evaluation.
 ```
 
 ```bash
-BenchmarkTools.Trial: 8301 samples with 1 evaluation.
- Range (min … max):  527.689 μs …  24.313 ms  ┊ GC (min … max): 0.00% … 96.95%
- Time  (median):     541.753 μs               ┊ GC (median):    0.00%
- Time  (mean ± σ):   598.787 μs ± 932.048 μs  ┊ GC (mean ± σ):  6.12% ±  3.84%
+BenchmarkTools.Trial: 7835 samples with 1 evaluation.
+ Range (min … max):  518.908 μs … 32.204 ms  ┊ GC (min … max): 0.00% … 97.64%
+ Time  (median):     549.309 μs              ┊ GC (median):    0.00%
+ Time  (mean ± σ):   633.500 μs ±  1.106 ms  ┊ GC (mean ± σ):  6.47% ±  3.65%
 
-   ▅██▇▇▆▅▄▄▄▃▃▃▂▂▁ ▁▁▁                        ▂▃▄▃▃▂           ▂
-  ▇█████████████████████▇▆▅▆▆▆▅▄▆▇███████▇▇█▆▆███████▇▆▇▇▆▇▆▆▅▄ █
-  528 μs        Histogram: log(frequency) by time        699 μs <
+  ██▇▆▆▅▄▄▄▄▄▃▂▂▃▂▁▁▁▁▁▁                                       ▂
+  ████████████████████████▇███▇▇▇▇▇█▇▇▆▇▆▆▆▆▆▆▆▅▆▆▇▆▆▅▆▆▅▅▅▅▅▄ █
+  519 μs        Histogram: log(frequency) by time      1.11 ms <
 
  Memory estimate: 315.84 KiB, allocs estimate: 7791.
 ```

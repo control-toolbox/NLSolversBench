@@ -1,8 +1,8 @@
 include("bench_utils.jl")
 
-function OCPProblem{(:exponential, :energy, :state_dim_1, :control_dim_1, :lagrange)}()
+function OCPProblem{(:exponential, :energy, :x_dim_1, :u_dim_1, :lagrange)}()
 
-    prob = Problem(:exponential, :energy, :state_dim_1, :control_dim_1, :lagrange) 
+    prob = Problem(:exponential, :energy, :x_dim_1, :u_dim_1, :lagrange)
     ocp = prob.model
 
     # Flow(ocp, u)
@@ -34,11 +34,11 @@ function OCPProblem{(:exponential, :energy, :state_dim_1, :control_dim_1, :lagra
     return(OCPShoot(ξ,shoot,prob.title))
 end
 
-function OCPProblem{(:exponential, :consumption, :state_dim_1, :control_dim_1, :lagrange, :control_non_differentiable)}()
+function OCPProblem{(:exponential, :consumption, :x_dim_1, :u_dim_1, :lagrange, :non_diff_wrt_u)}()
 
     # ---------------------------------------------------------------
     # problem = model + solution
-    prob = Problem(:exponential, :consumption, :state_dim_1, :control_dim_1, :lagrange, :control_non_differentiable) 
+    prob = Problem(:exponential, :consumption, :x_dim_1, :u_dim_1, :lagrange, :non_diff_wrt_u)
     ocp = prob.model
 
     # Flow(ocp, u)
@@ -78,11 +78,11 @@ function OCPProblem{(:exponential, :consumption, :state_dim_1, :control_dim_1, :
 
 end
 
-function OCPProblem{(:exponential, :time, :state_dim_1, :control_dim_1, :lagrange)}()
+function OCPProblem{(:exponential, :time, :x_dim_1, :u_dim_1, :lagrange)}()
 
     # ---------------------------------------------------------------
     # problem = model + solution
-    prob = Problem(:exponential, :time, :state_dim_1, :control_dim_1, :lagrange) 
+    prob = Problem(:exponential, :time, :x_dim_1, :u_dim_1, :lagrange)
     ocp = prob.model
 
     # Flow(ocp, u)
@@ -122,11 +122,11 @@ function OCPProblem{(:exponential, :time, :state_dim_1, :control_dim_1, :lagrang
 end
 
 
-function OCPProblem{(:integrator, :energy, :free_final_time, :state_dim_1, :control_dim_1, :lagrange)}()
+function OCPProblem{(:integrator, :energy, :free_final_time, :x_dim_1, :u_dim_1, :lagrange)}()
 
     # ---------------------------------------------------------------
     # problem = model + solution
-    prob = Problem(:integrator, :energy, :free_final_time, :state_dim_1, :control_dim_1, :lagrange)
+    prob = Problem(:integrator, :energy, :free_final_time, :x_dim_1, :u_dim_1, :lagrange)
     ocp = prob.model
     
 
@@ -162,11 +162,11 @@ function OCPProblem{(:integrator, :energy, :free_final_time, :state_dim_1, :cont
 
 end
 
-function OCPProblem{(:turnpike, :integrator, :state_energy, :state_dim_1, :control_dim_1, :lagrange, :control_constraint, :singular_arc) }()
+function OCPProblem{(:turnpike, :integrator, :state_energy, :x_dim_1, :u_dim_1, :lagrange, :u_cons, :singular_arc)}()
 
     # ---------------------------------------------------------------
     # problem = model + solution
-    prob = Problem(:turnpike, :integrator, :state_energy, :state_dim_1, :control_dim_1, :lagrange, :control_constraint, :singular_arc) 
+    prob = Problem(:turnpike, :integrator, :state_energy, :x_dim_1, :u_dim_1, :lagrange, :u_cons, :singular_arc)
     ocp = prob.model
 
 
@@ -215,10 +215,10 @@ function OCPProblem{(:turnpike, :integrator, :state_energy, :state_dim_1, :contr
 end
 
 
-function OCPProblem{(:integrator, :energy, :state_dim_2, :control_dim_1, :lagrange, :noconstraints)}()
+function OCPProblem{(:integrator, :energy, :x_dim_2, :u_dim_1, :lagrange, :noconstraints)}()
 
     # problem = model + solution
-    prob = Problem(:integrator, :energy, :state_dim_2, :control_dim_1, :lagrange, :noconstraints)
+    prob = Problem(:integrator, :energy, :x_dim_2, :u_dim_1, :lagrange, :noconstraints)
     ocp = prob.model
 
     # Flow(ocp, u)
@@ -255,11 +255,11 @@ function OCPProblem{(:integrator, :energy, :state_dim_2, :control_dim_1, :lagran
 end    
 
 
-function OCPProblem{(:integrator, :energy, :state_dim_2, :control_dim_1, :lagrange, :control_constraint)}()
+function OCPProblem{(:integrator, :energy, :x_dim_2, :u_dim_1, :lagrange, :u_cons)}()
 
     # ---------------------------------------------------------------
     # problem = model + solution
-    prob = Problem(:integrator, :energy, :state_dim_2, :control_dim_1, :lagrange, :control_constraint) 
+    prob = Problem(:integrator, :energy, :x_dim_2, :u_dim_1, :lagrange, :u_cons)
     ocp = prob.model
     sol = prob.solution
     title = prob.title
@@ -311,11 +311,10 @@ end
 
 
 
-function OCPProblem{(:goddard, :classical, :altitude, :state_dim_3, :control_dim_1, :mayer, :state_constraint, :control_constraint, :singular_arc)}()
+function OCPProblem{(:goddard, :classical, :altitude, :x_dim_3, :u_dim_1, :mayer, :x_cons, :u_cons, :singular_arc)}()
 
     #
-    prob = Problem(:goddard, :classical, :altitude, :state_dim_3, :control_dim_1, 
-        :mayer, :state_constraint, :control_constraint, :singular_arc)
+    prob = Problem(:goddard, :classical, :altitude, :x_dim_3, :u_dim_1, :mayer, :x_cons, :u_cons, :singular_arc)
     ocp = prob.model
 
     # parameters
@@ -422,10 +421,10 @@ function OCPProblem{(:goddard, :classical, :altitude, :state_dim_3, :control_dim
 end
 
 
-function OCPProblem{(:integrator, :energy, :distance, :state_dim_2, :control_dim_1, :bolza)}()
+function OCPProblem{(:integrator, :energy, :distance, :x_dim_2, :u_dim_1, :bolza)}()
 
     # problem = model + solution
-    prob = Problem(:integrator, :energy, :distance, :state_dim_2, :control_dim_1, :bolza)
+    prob = Problem(:integrator, :energy, :distance, :x_dim_2, :u_dim_1, :bolza)
     ocp = prob.model
 
     # Flow(ocp, u)
@@ -457,10 +456,10 @@ end
 
 
 
-function OCPProblem{(:orbital_transfert, :energy, :state_dim_4, :control_dim_2, :lagrange)}()
+function OCPProblem{(:orbital_transfert, :energy, :x_dim_4, :u_dim_2, :lagrange)}()
 
     # problem = model + solution
-    prob = Problem(:orbital_transfert, :energy, :state_dim_4, :control_dim_2, :lagrange) 
+    prob = Problem(:orbital_transfert, :energy, :x_dim_4, :u_dim_2, :lagrange) 
     ocp = prob.model
 
     # Flow(ocp, u)
