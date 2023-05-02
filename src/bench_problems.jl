@@ -262,7 +262,7 @@ function OCPProblem{(:integrator, :energy, :x_dim_2, :u_dim_1, :lagrange, :u_con
     prob = Problem(:integrator, :energy, :x_dim_2, :u_dim_1, :lagrange, :u_cons)
     ocp = prob.model
     sol = prob.solution
-    title = prob.title
+    title = "Double integrator energy - mininimise ∫ u² under the constraint norm(u) ≤ γ"
 
     # Flow(ocp, u)
     γ  = 5
@@ -303,7 +303,7 @@ function OCPProblem{(:integrator, :energy, :x_dim_2, :u_dim_1, :lagrange, :u_con
 
     nle(ξ) = shoot(ξ[1:2], ξ[3], ξ[4])
     
-    return(OCPShoot(ξ,nle,prob.title))
+    return(OCPShoot(ξ,nle,title))
 
 end
 

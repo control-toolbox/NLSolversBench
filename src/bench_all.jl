@@ -46,7 +46,7 @@ problem_list = [
 ]
 
 # generate variations of the true solution for each problem  
-ξ_list = Dict(pb => generate_variation(pb.sol,3,10) for pb in problem_list)
+ξ_list = Dict(pb => [generate_variation(pb.sol,0.5,10);generate_variation(pb.sol,2,10);generate_variation(pb.sol,10,10)] for pb in problem_list)
 
 # function that iterate over the problems, algos and variations to solve the non linear problem
 # return rate_tol, time_elapsed and df_rate 
@@ -70,7 +70,7 @@ function compute_rate(algos,problem_list,ξ_list)
                 ξ_guess = ξ_list[pb][i]
                 time_spent += @elapsed (res = solve_generic(pb.shoot,ξ_guess,algo.package,algo.name))
                 
-                # res = sol_shoot((ξ_guess isa Real) ? [ξ_guess] : ξ_gues,false)
+                # res = sol_shoot((ξ_guess isa Real) ? [ξ_guess] : ξ_guess,false)
                 # function solve_t()
                 #     time_spent = time_spent + @elapsed (res = solve_generic(pb.shoot,ξ_guess,algo.package,algo.name))
                 # end
@@ -79,11 +79,24 @@ function compute_rate(algos,problem_list,ξ_list)
 
                 # yield()
                 # t0 = time()
-                # while(!istaskdone(task_solve) && time()-t0 ≤ 5)
-                #     print("")
-                #     #istaskstarted(task_solve)
-                # end
-                # Base.throwto(task_solve, InterruptException())
+                # while(true)
+                #     println("!istaskdone(task_solve) = ",!istaskdone(task_solve),"  &&  time()-t0 ≤ 5 = ", time()-t0 ≤ 5)
+                #     if(!istaskdone(task_solve) && time()-t0 ≤ 5)
+                #         print("")
+                #         println("solving...")
+                #     elseif(!istaskdone(task_solve) && time()-t0 > 5)
+                #         println("Timeout !")
+                #         Base.throwto(task_solve, InterruptException())
+                #         break;
+                #     else
+                #         println("Task done !")
+                #         break;
+                #     end
+                #     yield()
+                #     println("end of wt")
+                # end                
+                
+                # println("while true exited")
 
                 E_rel = (norm(res.x) - norm(pb.sol))/norm(pb.sol)
                 E_tab = [E_rel ≤ 10.0^(-i) for i = 10:-2:0]

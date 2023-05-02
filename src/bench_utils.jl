@@ -54,7 +54,7 @@ end
 using Random
 using Distributions
 
-Random.seed!(123)
+Random.seed!(222)
 function generate_variation(ξ,σ,n)
     d = Uniform(-1,1)#Normal()
     ξ_var = [([σ*el*rand(d) for el in ξ] .+ ξ) for i = 1:n]
