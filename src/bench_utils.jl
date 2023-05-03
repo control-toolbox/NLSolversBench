@@ -3,7 +3,7 @@ struct sol_shoot
     converged::Bool
 end
 
-function solve_generic(shoot, ξ, lib, algo)
+function solve_generic(shoot, ξ, lib, algo, maxit)
     
     shoot!(s, ξ) = ( s[:] = shoot(ξ); nothing)
     shoot_p(ξ,p) = shoot(ξ)
@@ -12,20 +12,20 @@ function solve_generic(shoot, ξ, lib, algo)
         MLStyle.@match lib begin
             :MINPACK => begin
                             isreal = ξ isa Real
-                            shoot_sol = fsolve((s, ξ) -> isreal ? shoot!(s, ξ[1]) : shoot!(s, ξ), Float64.(isreal ? [ξ] : ξ), show_trace=false, method=algo, tol=1e-8)
+                            shoot_sol = fsolve((s, ξ) -> isreal ? shoot!(s, ξ[1]) : shoot!(s, ξ), Float64.(isreal ? [ξ] : ξ), show_trace=false, method=algo, tol=1e-8, iterations=maxit)
                             return(sol_shoot(shoot_sol.x, shoot_sol.converged))
                         end
             :NLsolve => begin
                             isreal = ξ isa Real
-                            shoot_sol = nlsolve((s, ξ) -> isreal ? shoot!(s, ξ[1]) : shoot!(s, ξ), Float64.(isreal ? [ξ] : ξ), autodiff = :forward, xtol=1e-8, show_trace=false, method=algo)
+                            shoot_sol = nlsolve((s, ξ) -> isreal ? shoot!(s, ξ[1]) : shoot!(s, ξ), Float64.(isreal ? [ξ] : ξ), autodiff = :forward, xtol=1e-8, show_trace=false, method=algo, iterations=maxit)
                             return(sol_shoot(shoot_sol.zero, shoot_sol.x_converged))
                         end
             :NonlinearSolve => begin
                             isreal = ξ isa Real
-                            shoot_sol = solve(NonlinearProblem(shoot_p, isreal ? ξ[1] : ξ, 0),algo,abstol=1e-8)
+                            shoot_sol = solve(NonlinearProblem(shoot_p, isreal ? ξ[1] : ξ, 0),algo,abstol=1e-8,maxiters=maxit)
                             return(sol_shoot(Vector{Float64}(vec(shoot_sol)), true))
                         end
-            _ => return(false)
+            _ => return(sol_shoot(ξ,false))
         end
     catch e
         println(e)

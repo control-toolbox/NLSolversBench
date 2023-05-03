@@ -43,6 +43,7 @@ problem_list = [
     #OCPProblem{(:goddard, :classical, :altitude, :x_dim_3, :u_dim_1, :mayer, :x_cons, :u_cons, :singular_arc)}() # Warning: dt(-8.804759669936376e-18) <= dtmin(1.3877787807814457e-17) at t=0.04188061327788384. Aborting. There is either an error in your model specification or the true solution is unstable. + error
     OCPProblem{(:integrator, :energy, :distance, :x_dim_2, :u_dim_1, :bolza)}()
     #OCPProblem{(:orbital_transfert, :energy, :x_dim_4, :u_dim_2, :lagrange)}() # Warning: Interrupted. Larger maxiters is needed. If you are using an integrator for non-stiff ODEs or an automatic switching algorithm (the default), you may want to consider using a method for stiff equations. See the solver pages for more details (e.g. https://docs.sciml.ai/DiffEqDocs/stable/solvers/ode_solve/#Stiff-Problems).
+    OCPProblem{(:integrator, :energy, :x_dim_2, :u_dim_1, :lagrange, :x_cons, :order_2)}()
 ]
 
 # generate variations of the true solution for each problem  
@@ -68,36 +69,7 @@ function compute_rate(algos,problem_list,ξ_list)
             iter = ProgressBar(1:size(collect(values(ξ_list))[1],1))
             for i in iter
                 ξ_guess = ξ_list[pb][i]
-                time_spent += @elapsed (res = solve_generic(pb.shoot,ξ_guess,algo.package,algo.name))
-                
-                # res = sol_shoot((ξ_guess isa Real) ? [ξ_guess] : ξ_guess,false)
-                # function solve_t()
-                #     time_spent = time_spent + @elapsed (res = solve_generic(pb.shoot,ξ_guess,algo.package,algo.name))
-                # end
-                # task_solve = Task(solve_t)
-                # schedule(task_solve)
-
-                # yield()
-                # t0 = time()
-                # while(true)
-                #     println("!istaskdone(task_solve) = ",!istaskdone(task_solve),"  &&  time()-t0 ≤ 5 = ", time()-t0 ≤ 5)
-                #     if(!istaskdone(task_solve) && time()-t0 ≤ 5)
-                #         print("")
-                #         println("solving...")
-                #     elseif(!istaskdone(task_solve) && time()-t0 > 5)
-                #         println("Timeout !")
-                #         Base.throwto(task_solve, InterruptException())
-                #         break;
-                #     else
-                #         println("Task done !")
-                #         break;
-                #     end
-                #     yield()
-                #     println("end of wt")
-                # end                
-                
-                # println("while true exited")
-
+                time_spent += @elapsed (res = solve_generic(pb.shoot,ξ_guess,algo.package,algo.name,100))          
                 E_rel = (norm(res.x) - norm(pb.sol))/norm(pb.sol)
                 E_tab = [E_rel ≤ 10.0^(-i) for i = 10:-2:0]
                 success = success + E_tab
@@ -126,7 +98,7 @@ plot([10.0^(-i) for i = 10:-2:0],[rates_tol[key] for key in collect(keys(rates_t
 plot!(xscale=:log10, yscale=:linear)
 plot!(legend=:outerbottom)
 savefig("build/bench_all.svg")
-
+println("Fig saved")
 # save the dataframe as csv (currently not used) 
 CSV.write("build/df_rate_algo.csv", df_rate)
 
