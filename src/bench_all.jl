@@ -69,7 +69,7 @@ function compute_rate(algos,problem_list,ξ_list)
             iter = ProgressBar(1:size(collect(values(ξ_list))[1],1))
             for i in iter
                 ξ_guess = ξ_list[pb][i]
-                time_spent += @elapsed (res = solve_generic(pb.shoot,ξ_guess,algo.package,algo.name,100))          
+                time_spent += @elapsed (res = solve_generic(pb.shoot,ξ_guess,algo.package,algo.name,100))
                 E_rel = (norm(res.x) - norm(pb.sol))/norm(pb.sol)
                 E_tab = [E_rel ≤ 10.0^(-i) for i = 10:-2:0]
                 success = success + E_tab
@@ -95,10 +95,10 @@ rates_tol,times,df_rate = compute_rate(algos,problem_list,ξ_list)
 
 # plot rate vs relative error 
 plot([10.0^(-i) for i = 10:-2:0],[rates_tol[key] for key in collect(keys(rates_tol))], label = reshape([shorten_label(string(key))*" in mean time "*string(times[key]) for key in collect(keys(rates_tol))],1,size(algos,1)))
-plot!(xscale=:log10, yscale=:linear)
+plot!(xscale=:log10, yscale=:linear, title="Percentage of acceptable solution to relative error")
 plot!(legend=:outerbottom)
-savefig("build/bench_all.svg")
-println("Fig saved")
+savefig("build/bench_all.svg");
+
 # save the dataframe as csv (currently not used) 
 CSV.write("build/df_rate_algo.csv", df_rate)
 

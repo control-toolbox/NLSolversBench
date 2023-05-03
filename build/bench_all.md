@@ -25,12 +25,9 @@ problem_list = [OCPProblem{(:exponential, :energy, :x_dim_1, :u_dim_1, :lagrange
 ξ_list = Dict((pb => [generate_variation(pb.sol, 0.5, 10); generate_variation(pb.sol, 2, 10); generate_variation(pb.sol, 10, 10)] for pb = problem_list))
 (rates_tol, times, df_rate) = compute_rate(algos, problem_list, ξ_list)
 plot([10.0 ^ -i for i = 10:-2:0], [rates_tol[key] for key = collect(keys(rates_tol))], label = reshape([shorten_label(string(key)) * " in mean time " * string(times[key]) for key = collect(keys(rates_tol))], 1, size(algos, 1)))
-plot!(xscale = :log10, yscale = :linear)
+plot!(xscale = :log10, yscale = :linear, title = "Percentage of acceptable solution to relative error")
 plot!(legend = :outerbottom)
-savefig("build/bench_all.svg")
-```
- ![fig](bench_all.svg) 
- ```julia 
+$(Expr(:toplevel, :(savefig("build/bench_all.svg"))))
 CSV.write("build/df_rate_algo.csv", df_rate)
 h1 = Highlighter(((df_rate, i, j)->begin
                 j in [2, 3, 4, 5] && df_rate[i, j] == minimum(df_rate[:, j])
