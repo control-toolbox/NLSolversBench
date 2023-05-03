@@ -82,7 +82,7 @@ function bench(file::String)
                         doBenchMarking(quote $benchname end, f)
                         expr = :()
                     end
-                    Expr(:call, fun, args...)   => begin
+                    Expr(:call, fun, args...) => begin
                         write(f, string(expr)*"\n")
                         if(string(expr.args[1]) == "savefig")
                             write(f,"```\n ![fig](bench_all.svg) \n ```julia \n")
@@ -91,7 +91,7 @@ function bench(file::String)
                             displayTable(expr,f)
                         end
                     end
-                    Expr(:function, sig, args...)         => begin
+                    Expr(:function, sig, args...) => begin
                         nothing
                     end 
                     _ => begin
