@@ -1,0 +1,5 @@
+name,"algo_nl(:MINPACK, :hybr)","algo_nl(:NLsolve, :trust_region)"
+Orbital transfert - energy minimisation - min ∫ ‖u‖² dt,0.8,0.8
+Orbital transfert - consumption minimisation - ∫ ‖u‖ dt ,0.4,0.7
+Orbital transfert - time minimisation,0.5,0.3
+mean,0.5666666666666668,0.6

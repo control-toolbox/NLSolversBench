@@ -1,3 +1,0 @@
-name,"algo_nl(:MINPACK, :hybr)","algo_nl(:NLsolve, :newton)","algo_nl(:NLsolve, :trust_region)","algo_nl(:NonlinearSolve, NewtonRaphson)"
-Orbital transfert - consumption minimisation - ∫ ‖u‖ dt ,0.7,0.3,0.4,0.3
-mean,0.7,0.3,0.4,0.3

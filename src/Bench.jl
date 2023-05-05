@@ -44,7 +44,6 @@ function bench(file::String)
     file_name_output = joinpath("build/" * file_name * ".md")
     open(file_name_output, write=true, append=false) do f
         write(f, "# Benchmarks for $file_name.jl\n\n")
-        #show(f,"text/plain", Pkg.status(; f))
         write(f, "```julia\n")
     end
 
@@ -85,7 +84,7 @@ function bench(file::String)
                     Expr(:call, fun, args...) => begin
                         write(f, string(expr)*"\n")
                         if(string(expr.args[1]) == "savefig")
-                            write(f,"```\n ![fig](bench_all.svg) \n ```julia \n")
+                            write(f,"```\n ![fig]("*split(expr.args[2], ('/'))[2]*") \n ```julia \n")
                         end
                         if(string(expr.args[1]) == "pretty_table")
                             displayTable(expr,f)
